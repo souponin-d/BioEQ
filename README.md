@@ -1,13 +1,15 @@
 # BioEQ
 
-Современное React-приложение для сбора входных параметров проектирования исследования биоэквивалентности.
+React + TypeScript + Vite приложение для подготовки параметров исследования биоэквивалентности.
 
 ## Стек
 
 - React 18 + TypeScript + Vite
+- Tailwind CSS
+- Framer Motion
+- React Router DOM
 - React Hook Form + Zod
 - Axios
-- MUI v5
 
 ## Запуск
 
@@ -16,14 +18,27 @@ npm install
 npm run dev
 ```
 
+Сборка production:
+
+```bash
+npm run build
+```
+
+## Роуты
+
+- `/` — стартовый экран (LandingPage)
+- `/form` — форма для отправки параметров исследования (FormPage)
+
 ## Структура проекта
 
 ```text
 src/
   components/
+    AnimatedBackground.tsx
     BioEQForm.tsx
   pages/
-    HomePage.tsx
+    LandingPage.tsx
+    FormPage.tsx
   services/
     api.ts
   types/
@@ -33,22 +48,6 @@ src/
   main.tsx
 ```
 
-## Пример отправляемого JSON
+## API
 
-```json
-{
-  "inn": "Metformin",
-  "dosage_form": "Таблетки",
-  "dosage": "500 мг",
-  "cvintra": "auto",
-  "rsabe": "auto",
-  "preferred_design": "auto",
-  "administration_mode": ["Натощак", "После еды"],
-  "study_type": "Однократное введение",
-  "additional_requirements": {
-    "gender": "Оба пола",
-    "age_range": "18–45 лет",
-    "other_constraints": "BMI 18–30"
-  }
-}
-```
+Форма отправляет `POST` на `http://localhost:8000/api/generate`.

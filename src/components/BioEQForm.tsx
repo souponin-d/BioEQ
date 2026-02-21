@@ -1,27 +1,4 @@
-import { useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Radio,
-  RadioGroup,
-  Select,
-  Snackbar,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { ReactNode, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema, BioEQFormSchema } from '../types/formSchema';
@@ -47,6 +24,9 @@ const normalizePayload = (data: BioEQFormSchema): BioEQFormData => ({
   }
 });
 
+const baseInput =
+  'mt-1 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20';
+
 export const BioEQForm = () => {
   const {
     register,
@@ -61,11 +41,11 @@ export const BioEQForm = () => {
       dosage_form: 'Таблетки',
       dosage_form_other: '',
       dosage: '',
-      cvintra: 'auto',
-      rsabe: 'auto',
-      preferred_design: 'auto',
+      cvintra: 'Определить автоматически',
+      rsabe: 'Определить автоматически',
+      preferred_design: 'Определить автоматически',
       administration_mode: [],
-      study_type: 'auto',
+      study_type: 'Определить автоматически',
       additional_requirements: {
         gender: '',
         age_range: '',
@@ -74,255 +54,201 @@ export const BioEQForm = () => {
     }
   });
 
-  const [successOpen, setSuccessOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const dosageForm = watch('dosage_form');
 
   const onSubmit = async (values: BioEQFormSchema) => {
     try {
-      const payload = normalizePayload(values);
-      await sendBioEQRequest(payload);
-      setSuccessOpen(true);
+      await sendBioEQRequest(normalizePayload(values));
+      setSuccessMessage('Запрос успешно отправлен.');
       setErrorMessage('');
     } catch {
       setErrorMessage('Ошибка отправки данных. Пожалуйста, попробуйте ещё раз.');
+      setSuccessMessage('');
     }
   };
 
   return (
-    <Paper elevation={0} sx={{ p: { xs: 3, md: 5 }, boxShadow: '0 16px 40px rgba(24, 102, 191, 0.12)' }}>
-      <Stack spacing={4} component="form" onSubmit={handleSubmit(onSubmit)}>
-        <Box>
-          <Typography variant="h6" fontWeight={700} mb={2}>
-            1. Основная информация о препарате
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="INN (МНН)"
-                {...register('inn')}
-                error={Boolean(errors.inn)}
-                helperText={errors.inn?.message}
+    <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+      <Section title="1. Основная информация о препарате">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="INN (МНН)" error={errors.inn?.message}>
+            <input className={baseInput} placeholder="Например, Метформин" {...register('inn')} />
+          </Field>
+          <Field label="Лекарственная форма" error={errors.dosage_form?.message}>
+            <select className={baseInput} {...register('dosage_form')}>
+              {['Таблетки', 'Капсулы', 'Раствор', 'Суспензия', 'Инъекционная форма', 'Другое'].map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {dosageForm === 'Другое' && (
+            <div className="md:col-span-2">
+              <Field label="Уточните лекарственную форму" error={errors.dosage_form_other?.message}>
+                <input className={baseInput} placeholder="Введите вручную" {...register('dosage_form_other')} />
+              </Field>
+            </div>
+          )}
+          <Field label="Дозировка" error={errors.dosage?.message}>
+            <input className={baseInput} placeholder='Например, "500 мг", "10 мг/мл"' {...register('dosage')} />
+          </Field>
+        </div>
+      </Section>
+
+      <Section title="2. Параметры вариабельности">
+        <div className="grid gap-4 md:grid-cols-2">
+          <RadioGroupField
+            title="CVintra"
+            name="cvintra"
+            options={['Низкая', 'Высокая', 'Определить автоматически']}
+            control={control}
+            error={errors.cvintra?.message}
+          />
+          <RadioGroupField
+            title="RSABE"
+            name="rsabe"
+            options={['Да', 'Нет', 'Определить автоматически']}
+            control={control}
+            error={errors.rsabe?.message}
+          />
+        </div>
+      </Section>
+
+      <Section title="3. Дизайн исследования">
+        <div className="space-y-5">
+          <RadioGroupField
+            title="Предпочтительный дизайн"
+            name="preferred_design"
+            options={['Определить автоматически', '2×2 crossover', 'Replicate', 'Параллельный']}
+            control={control}
+            error={errors.preferred_design?.message}
+          />
+
+          <div>
+            <p className="text-sm font-medium text-primary">Режим приёма</p>
+            <div className="mt-2 flex flex-wrap gap-4">
+              {administrationOptions.map((option) => (
+                <label key={option} className="flex items-center gap-2 text-sm text-primary">
+                  <input
+                    type="checkbox"
+                    value={option}
+                    {...register('administration_mode')}
+                    className="h-4 w-4 rounded border-neutral-300 text-accent focus:ring-accent"
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+            {errors.administration_mode && <p className="mt-1 text-sm text-red-600">{errors.administration_mode.message}</p>}
+          </div>
+
+          <RadioGroupField
+            title="Тип исследования"
+            name="study_type"
+            options={['Однократное введение', 'Многократное введение', 'Определить автоматически']}
+            control={control}
+            error={errors.study_type?.message}
+          />
+        </div>
+      </Section>
+
+      <Section title="4. Дополнительные требования заказчика (опционально)">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Гендерный состав">
+            <select className={baseInput} {...register('additional_requirements.gender')}>
+              <option value="">Не указано</option>
+              {['Мужчины', 'Женщины', 'Оба пола'].map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Возрастной диапазон">
+            <input className={baseInput} placeholder="18–45 лет" {...register('additional_requirements.age_range')} />
+          </Field>
+          <div className="md:col-span-2">
+            <Field label="Иные ограничения">
+              <textarea
+                rows={4}
+                className={baseInput}
+                placeholder="Укажите дополнительные критерии"
+                {...register('additional_requirements.other_constraints')}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={Boolean(errors.dosage_form)}>
-                <InputLabel id="dosage-form-label">Лекарственная форма</InputLabel>
-                <Controller
-                  name="dosage_form"
-                  control={control}
-                  render={({ field }) => (
-                    <Select {...field} labelId="dosage-form-label" label="Лекарственная форма">
-                      {['Таблетки', 'Капсулы', 'Раствор', 'Суспензия', 'Инъекционная форма', 'Другое'].map((item) => (
-                        <MenuItem key={item} value={item}>
-                          {item}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                />
-                <FormHelperText>{errors.dosage_form?.message}</FormHelperText>
-              </FormControl>
-            </Grid>
-            {dosageForm === 'Другое' && (
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Укажите лекарственную форму"
-                  {...register('dosage_form_other')}
-                  error={Boolean(errors.dosage_form_other)}
-                  helperText={errors.dosage_form_other?.message}
-                />
-              </Grid>
-            )}
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Дозировка"
-                placeholder="500 мг, 10 мг/мл"
-                {...register('dosage')}
-                error={Boolean(errors.dosage)}
-                helperText={errors.dosage?.message}
-              />
-            </Grid>
-          </Grid>
-        </Box>
+            </Field>
+          </div>
+        </div>
+      </Section>
 
-        <Divider />
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full rounded-xl bg-primary px-5 py-3 text-base font-semibold text-white transition hover:bg-primary/95 disabled:cursor-not-allowed disabled:bg-primary/60 md:w-auto"
+      >
+        {isSubmitting ? 'Отправка...' : 'Сформировать запрос'}
+      </button>
 
-        <Box>
-          <Typography variant="h6" fontWeight={700} mb={2}>
-            2. Параметры вариабельности
-          </Typography>
-          <Stack spacing={2}>
-            <FormControl error={Boolean(errors.cvintra)}>
-              <FormLabel>Предполагаемая внутрисубъектная вариабельность (CVintra)</FormLabel>
-              <Controller
-                name="cvintra"
-                control={control}
-                render={({ field }) => (
-                  <RadioGroup row {...field}>
-                    <FormControlLabel value="Низкая" control={<Radio />} label="Низкая" />
-                    <FormControlLabel value="Высокая" control={<Radio />} label="Высокая" />
-                    <FormControlLabel value="auto" control={<Radio />} label="Определить автоматически" />
-                  </RadioGroup>
-                )}
-              />
-              <FormHelperText>{errors.cvintra?.message}</FormHelperText>
-            </FormControl>
-
-            <FormControl error={Boolean(errors.rsabe)}>
-              <FormLabel>Необходимость применения RSABE</FormLabel>
-              <Controller
-                name="rsabe"
-                control={control}
-                render={({ field }) => (
-                  <RadioGroup row {...field}>
-                    <FormControlLabel value="Да" control={<Radio />} label="Да" />
-                    <FormControlLabel value="Нет" control={<Radio />} label="Нет" />
-                    <FormControlLabel value="auto" control={<Radio />} label="Определить автоматически" />
-                  </RadioGroup>
-                )}
-              />
-              <FormHelperText>{errors.rsabe?.message}</FormHelperText>
-            </FormControl>
-          </Stack>
-        </Box>
-
-        <Divider />
-
-        <Box>
-          <Typography variant="h6" fontWeight={700} mb={2}>
-            3. Дизайн исследования
-          </Typography>
-          <Stack spacing={2}>
-            <FormControl error={Boolean(errors.preferred_design)}>
-              <FormLabel>Предпочтительный дизайн</FormLabel>
-              <Controller
-                name="preferred_design"
-                control={control}
-                render={({ field }) => (
-                  <RadioGroup row {...field}>
-                    <FormControlLabel value="auto" control={<Radio />} label="Определить автоматически" />
-                    <FormControlLabel value="2×2 crossover" control={<Radio />} label="2×2 crossover" />
-                    <FormControlLabel value="Replicate" control={<Radio />} label="Replicate" />
-                    <FormControlLabel value="Параллельный" control={<Radio />} label="Параллельный" />
-                  </RadioGroup>
-                )}
-              />
-              <FormHelperText>{errors.preferred_design?.message}</FormHelperText>
-            </FormControl>
-
-            <FormControl error={Boolean(errors.administration_mode)}>
-              <FormLabel>Режим приёма</FormLabel>
-              <Controller
-                name="administration_mode"
-                control={control}
-                render={({ field }) => (
-                  <Stack direction="row" flexWrap="wrap">
-                    {administrationOptions.map((option) => (
-                      <FormControlLabel
-                        key={option}
-                        control={
-                          <Checkbox
-                            checked={field.value.includes(option)}
-                            onChange={(event) => {
-                              const nextValue = event.target.checked
-                                ? [...field.value, option]
-                                : field.value.filter((item) => item !== option);
-                              field.onChange(nextValue);
-                            }}
-                          />
-                        }
-                        label={option}
-                      />
-                    ))}
-                  </Stack>
-                )}
-              />
-              <FormHelperText>{errors.administration_mode?.message}</FormHelperText>
-            </FormControl>
-
-            <FormControl error={Boolean(errors.study_type)}>
-              <FormLabel>Тип исследования</FormLabel>
-              <Controller
-                name="study_type"
-                control={control}
-                render={({ field }) => (
-                  <RadioGroup row {...field}>
-                    <FormControlLabel value="Однократное введение" control={<Radio />} label="Однократное введение" />
-                    <FormControlLabel value="Многократное введение" control={<Radio />} label="Многократное введение" />
-                    <FormControlLabel value="auto" control={<Radio />} label="Определить автоматически" />
-                  </RadioGroup>
-                )}
-              />
-              <FormHelperText>{errors.study_type?.message}</FormHelperText>
-            </FormControl>
-          </Stack>
-        </Box>
-
-        <Divider />
-
-        <Box>
-          <Typography variant="h6" fontWeight={700} mb={2}>
-            4. Дополнительные требования заказчика
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="gender-label">Гендерный состав</InputLabel>
-                <Controller
-                  name="additional_requirements.gender"
-                  control={control}
-                  render={({ field }) => (
-                    <Select {...field} labelId="gender-label" label="Гендерный состав">
-                      <MenuItem value="">Не выбрано</MenuItem>
-                      <MenuItem value="Мужчины">Мужчины</MenuItem>
-                      <MenuItem value="Женщины">Женщины</MenuItem>
-                      <MenuItem value="Оба пола">Оба пола</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Возрастной диапазон" placeholder="18–45 лет" {...register('additional_requirements.age_range')} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth multiline minRows={3} label="Иные ограничения" {...register('additional_requirements.other_constraints')} />
-            </Grid>
-          </Grid>
-        </Box>
-
-        <Button
-          type="submit"
-          variant="contained"
-          size="large"
-          disabled={isSubmitting}
-          sx={{
-            py: 1.5,
-            fontWeight: 700,
-            background: 'linear-gradient(90deg, #1e88e5 0%, #42a5f5 100%)',
-            transition: 'all 0.25s ease',
-            '&:hover': {
-              transform: 'translateY(-1px)',
-              boxShadow: '0 12px 24px rgba(30, 136, 229, 0.3)',
-              background: 'linear-gradient(90deg, #1976d2 0%, #2196f3 100%)'
-            }
-          }}
-        >
-          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Сформировать запрос'}
-        </Button>
-
-        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-      </Stack>
-
-      <Snackbar open={successOpen} autoHideDuration={3500} onClose={() => setSuccessOpen(false)}>
-        <Alert severity="success" onClose={() => setSuccessOpen(false)}>
-          Данные успешно отправлены на сервер
-        </Alert>
-      </Snackbar>
-    </Paper>
+      {successMessage && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{successMessage}</p>}
+      {errorMessage && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p>}
+    </form>
   );
 };
+
+type FieldProps = {
+  label: string;
+  children: ReactNode;
+  error?: string;
+};
+
+const Field = ({ label, children, error }: FieldProps) => (
+  <label className="block text-sm font-medium text-primary">
+    {label}
+    {children}
+    {error && <span className="mt-1 block text-sm text-red-600">{error}</span>}
+  </label>
+);
+
+const Section = ({ title, children }: { title: string; children: ReactNode }) => (
+  <section className="space-y-4 border-b border-neutral-200 pb-6 last:border-0 last:pb-0">
+    <h2 className="text-lg font-semibold text-primary">{title}</h2>
+    {children}
+  </section>
+);
+
+type RadioGroupFieldProps = {
+  title: string;
+  name: 'cvintra' | 'rsabe' | 'preferred_design' | 'study_type';
+  options: string[];
+  control: ReturnType<typeof useForm<BioEQFormSchema>>['control'];
+  error?: string;
+};
+
+const RadioGroupField = ({ title, name, options, control, error }: RadioGroupFieldProps) => (
+  <Controller
+    name={name}
+    control={control}
+    render={({ field }) => (
+      <div>
+        <p className="text-sm font-medium text-primary">{title}</p>
+        <div className="mt-2 flex flex-wrap gap-4">
+          {options.map((option) => (
+            <label key={option} className="flex items-center gap-2 text-sm text-primary">
+              <input
+                type="radio"
+                value={option}
+                checked={field.value === option}
+                onChange={field.onChange}
+                className="h-4 w-4 border-neutral-300 text-accent focus:ring-accent"
+              />
+              {option}
+            </label>
+          ))}
+        </div>
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      </div>
+    )}
+  />
+);
