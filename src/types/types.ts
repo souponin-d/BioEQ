@@ -6,10 +6,10 @@ export type DosageForm =
   | 'Инъекционная форма'
   | 'Другое';
 
-export type CvintraOption = 'Низкая' | 'Высокая' | 'auto';
-export type RsabeOption = 'Да' | 'Нет' | 'auto';
-export type PreferredDesign = 'auto' | '2×2 crossover' | 'Replicate' | 'Параллельный';
-export type StudyType = 'Однократное введение' | 'Многократное введение' | 'auto';
+export type CvintraOption = 'Низкая' | 'Высокая' | 'Определить автоматически';
+export type RsabeOption = 'Да' | 'Нет' | 'Определить автоматически';
+export type PreferredDesign = 'Определить автоматически' | '2×2 crossover' | 'Replicate' | 'Параллельный';
+export type StudyType = 'Однократное введение' | 'Многократное введение' | 'Определить автоматически';
 export type AdministrationMode = 'Натощак' | 'После еды' | 'Оба варианта';
 
 export interface AdditionalRequirements {

@@ -8,17 +8,17 @@ export const formSchema = z
     }),
     dosage_form_other: z.string().optional(),
     dosage: z.string().min(1, 'Поле «Дозировка» обязательно для заполнения'),
-    cvintra: z.enum(['Низкая', 'Высокая', 'auto'], {
+    cvintra: z.enum(['Низкая', 'Высокая', 'Определить автоматически'], {
       required_error: 'Выберите параметр CVintra'
     }),
-    rsabe: z.enum(['Да', 'Нет', 'auto'], {
+    rsabe: z.enum(['Да', 'Нет', 'Определить автоматически'], {
       required_error: 'Выберите необходимость применения RSABE'
     }),
-    preferred_design: z.enum(['auto', '2×2 crossover', 'Replicate', 'Параллельный'], {
+    preferred_design: z.enum(['Определить автоматически', '2×2 crossover', 'Replicate', 'Параллельный'], {
       required_error: 'Выберите предпочтительный дизайн'
     }),
     administration_mode: z.array(z.enum(['Натощак', 'После еды', 'Оба варианта'])).min(1, 'Выберите минимум один режим приёма'),
-    study_type: z.enum(['Однократное введение', 'Многократное введение', 'auto'], {
+    study_type: z.enum(['Однократное введение', 'Многократное введение', 'Определить автоматически'], {
       required_error: 'Выберите тип исследования'
     }),
     additional_requirements: z.object({
