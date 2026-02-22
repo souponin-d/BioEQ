@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type PointerEventHandler, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image1 from '../assets/images/1.png';
 import image2 from '../assets/images/2.png';
@@ -15,10 +15,10 @@ const storySteps = [
 ];
 
 const teamMembers = [
-  { image: image1, name: 'Супонин Дмитрий Александрович', role: 'FullStack, ML-инженер', contact: 'tg: @hello_world_enjoyer' },
-  { image: image2, name: 'Федорцова Елизавета Владимировна', role: 'Специалист по регуляторике, Биостатистик' },
-  { image: image3, name: 'Савочкин Андрей Владимирович', role: 'Специалист по фармакокинетике, Биостатистик' },
-  { image: image4, name: 'Глытов Иван Владимирович', role: 'Медицинский консультант, Аналитик' }
+  { image: image1, name: 'Супонин Дмитрий', role: 'FullStack, ML-инженер', contact: 'tg: @hello_world_enjoyer' },
+  { image: image2, name: 'Федорцова Елизавета', role: 'Специалист по регуляторике, Биостатистик' },
+  { image: image3, name: 'Савочкин Андрей', role: 'Специалист по фармакокинетике, Биостатистик' },
+  { image: image4, name: 'Глытов Иван', role: 'Медицинский консультант, Аналитик' }
 ];
 
 const sectionLinks = [
@@ -34,15 +34,26 @@ const exampleCards = Array.from({ length: 4 }, (_, index) => ({
   text: 'Короткий пример входных данных и ожидаемого результата проектирования исследования.'
 }));
 
-const loopedExampleCards = [...exampleCards, ...exampleCards];
+const CAROUSEL_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+const SWIPE_THRESHOLD = 50;
 
 export const LandingPage = () => {
   const navigate = useNavigate();
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const carouselTrackRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const [activeSection, setActiveSection] = useState('examples');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [isTransitionEnabled, setIsTransitionEnabled] = useState(!prefersReducedMotion);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const displayCards = useMemo(() => {
+    if (exampleCards.length <= 1) return exampleCards;
+    return [exampleCards[exampleCards.length - 1], ...exampleCards, exampleCards[0]];
+  }, []);
 
   const goToForm = () => navigate('/forms');
 
@@ -66,6 +77,8 @@ export const LandingPage = () => {
     [prefersReducedMotion]
   );
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   const scrollToId = (id: string) => {
     const target = document.getElementById(id);
     if (!target) return;
@@ -73,27 +86,26 @@ export const LandingPage = () => {
     const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
     window.history.pushState(null, '', `#${id}`);
     window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    closeMobileMenu();
   };
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    if (!carouselRef.current) return;
-    const amount = Math.round(carouselRef.current.clientWidth * 0.92);
-    carouselRef.current.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  const moveSlide = (direction: 'left' | 'right') => {
+    setCurrentSlide((prev) => prev + (direction === 'right' ? 1 : -1));
   };
 
   useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-    const halfWidth = carousel.scrollWidth / 2;
-    carousel.scrollLeft = halfWidth;
-    const handleScroll = () => {
-      const threshold = 2;
-      if (carousel.scrollLeft <= threshold) carousel.scrollLeft = halfWidth - threshold;
-      else if (carousel.scrollLeft >= halfWidth * 2 - carousel.clientWidth - threshold) carousel.scrollLeft = halfWidth;
+    setIsTransitionEnabled(!prefersReducedMotion);
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (!isMobileMenuOpen || !navRef.current) return;
+      if (!navRef.current.contains(event.target as Node)) setIsMobileMenuOpen(false);
     };
-    carousel.addEventListener('scroll', handleScroll, { passive: true });
-    return () => carousel.removeEventListener('scroll', handleScroll);
-  }, []);
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const sections = sectionLinks.map((item) => document.getElementById(item.id)).filter(Boolean) as HTMLElement[];
@@ -139,6 +151,48 @@ export const LandingPage = () => {
     return () => observer.disconnect();
   }, [prefersReducedMotion]);
 
+  const onPointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
+    setTouchStartX(event.clientX);
+  };
+
+  const onPointerUp: PointerEventHandler<HTMLDivElement> = (event) => {
+    if (touchStartX === null) return;
+    const deltaX = event.clientX - touchStartX;
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      moveSlide(deltaX < 0 ? 'right' : 'left');
+    }
+    setTouchStartX(null);
+  };
+
+  const onCarouselTransitionEnd = () => {
+    if (displayCards.length <= 1) return;
+
+    if (currentSlide === displayCards.length - 1) {
+      setIsTransitionEnabled(false);
+      setCurrentSlide(1);
+      return;
+    }
+
+    if (currentSlide === 0) {
+      setIsTransitionEnabled(false);
+      setCurrentSlide(exampleCards.length);
+    }
+  };
+
+  useEffect(() => {
+    if (isTransitionEnabled) return;
+
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!prefersReducedMotion) {
+          setIsTransitionEnabled(true);
+        }
+      });
+    });
+
+    return () => cancelAnimationFrame(id);
+  }, [isTransitionEnabled, prefersReducedMotion]);
+
   return (
     <main className="bg-base text-text">
       <div className="relative min-h-screen isolate overflow-hidden bg-base">
@@ -146,19 +200,19 @@ export const LandingPage = () => {
 
         <header
           ref={headerRef}
-          className={`sticky top-0 z-30 border-b border-white/10 backdrop-blur-md transition-all duration-300 ${
-            isScrolled ? 'bg-[rgba(11,18,36,0.85)]' : 'bg-[rgba(255,255,255,0.06)]'
+          className={`fixed inset-x-0 top-0 z-30 transition-all duration-300 ${
+            isScrolled ? 'bg-base/80 shadow-[0_20px_45px_-35px_rgba(0,0,0,0.8)] backdrop-blur-xl' : 'bg-transparent'
           }`}
         >
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div ref={navRef} className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <span className="text-lg font-semibold tracking-tight text-white">BioEQ</span>
-            <nav className="hidden items-center gap-6 text-sm sm:flex">
+            <nav className="hidden items-center gap-6 text-sm md:flex">
               {sectionLinks.map((link) => (
                 <button
                   key={link.id}
                   type="button"
                   onClick={() => scrollToId(link.id)}
-                  className={`relative py-1 transition ${
+                  className={`relative py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base ${
                     activeSection === link.id ? 'text-white' : 'text-white/75 hover:text-white'
                   }`}
                 >
@@ -170,25 +224,52 @@ export const LandingPage = () => {
               ))}
             </nav>
 
-            <Button onClick={goToForm} variant="outline" className="w-full sm:w-auto">
-              Старт
-            </Button>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-border bg-surface1 px-3 py-2 text-sm text-white transition hover:bg-surface2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base md:hidden"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-nav"
+              aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            >
+              {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
+          </div>
+
+          <div
+            id="mobile-nav"
+            className={`border-t border-border bg-base/95 px-4 py-4 backdrop-blur-lg transition md:hidden ${
+              isMobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+            }`}
+          >
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
+              {sectionLinks.map((link) => (
+                <button
+                  key={link.id}
+                  type="button"
+                  onClick={() => scrollToId(link.id)}
+                  className="w-full rounded-md border border-border px-3 py-2 text-left text-sm text-white/85 transition hover:bg-surface2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 
         <section className="relative z-10 text-white">
-          <div className="relative z-10 mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <div className="relative z-10 mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
             <motion.div className="max-w-3xl text-center lg:text-left" variants={heroVariants} initial="hidden" animate="visible">
-              <motion.h1 variants={heroItem} className="text-5xl font-semibold leading-none tracking-tight text-white sm:text-6xl lg:text-7xl">
+              <motion.h1 variants={heroItem} className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
                 BioEQ
               </motion.h1>
-              <motion.p variants={heroItem} className="mt-5 text-lg text-white/85 sm:text-xl">
+              <motion.p variants={heroItem} className="mt-5 text-base text-white/85 sm:text-xl">
                 AI-инструмент для автоматизированного проектирования исследований биоэквивалентности
               </motion.p>
               <motion.p variants={heroItem} className="mx-auto mt-5 max-w-2xl text-base text-white/70 lg:mx-0 lg:text-lg">
                 Вы заполняете параметры препарата, а наши ИИ-агенты делают всё остальное
               </motion.p>
-              <motion.div variants={heroItem} className="mt-10">
+              <motion.div variants={heroItem} className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <Button onClick={goToForm} className="w-full sm:w-auto sm:px-8 sm:py-4 sm:text-base">
                   Старт
                 </Button>
@@ -198,40 +279,66 @@ export const LandingPage = () => {
         </section>
       </div>
 
-      <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <div className="reveal-item flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Примеры</h2>
-          <div className="hidden items-center gap-3 md:flex">
-            <button type="button" onClick={() => scrollCarousel('left')} className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text">←</button>
-            <button type="button" onClick={() => scrollCarousel('right')} className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text">→</button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              aria-label="Предыдущий слайд"
+              onClick={() => moveSlide('left')}
+              className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              aria-label="Следующий слайд"
+              onClick={() => moveSlide('right')}
+              className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+            >
+              →
+            </button>
           </div>
         </div>
 
-        <div ref={carouselRef} className="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {loopedExampleCards.map((card, index) => (
-            <article
-              key={`${card.id}-${index}`}
-              data-reveal-delay={(index % 4) * 70}
-              className="reveal-item min-w-[82%] snap-start rounded-2xl border border-border bg-surface1 p-6 shadow-card sm:min-w-[56%] lg:min-w-[38%]"
-            >
-              <h3 className="text-xl font-semibold">{card.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-text2">{card.text}</p>
-              <Button variant="outline" className="mt-6">Скачать</Button>
-            </article>
-          ))}
+        <div className="mt-8 overflow-hidden" onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+          <div
+            ref={carouselTrackRef}
+            onTransitionEnd={onCarouselTransitionEnd}
+            className="flex"
+            style={{
+              transform: `translateX(-${currentSlide * 100}%)`,
+              transition: isTransitionEnabled ? `transform ${prefersReducedMotion ? 0 : 420}ms ${CAROUSEL_EASING}` : 'none'
+            }}
+          >
+            {displayCards.map((card, index) => (
+              <article
+                key={`${card.id}-${index}`}
+                data-reveal-delay={(index % 4) * 70}
+                className="reveal-item w-full shrink-0 rounded-2xl border border-border bg-surface1 p-6 shadow-card"
+              >
+                <h3 className="text-xl font-semibold">{card.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-text2">{card.text}</p>
+                <Button variant="outline" className="mt-6">
+                  Скачать
+                </Button>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="team" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section id="team" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <h2 className="reveal-item text-2xl font-semibold tracking-tight sm:text-3xl">Команда</h2>
-        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
           {teamMembers.map((member, index) => (
             <article
               key={member.name}
               data-reveal-delay={index * 80}
-              className="reveal-item flex items-center gap-5 border border-border bg-surface1 p-5"
+              className="reveal-item flex items-center gap-4 border border-border bg-surface1 p-4 sm:gap-5 sm:p-5"
             >
-              <img src={member.image} alt={member.name} className="h-24 w-24 flex-none rounded-full object-cover md:h-28 md:w-28" />
+              <img src={member.image} alt={member.name} className="h-20 w-20 flex-none rounded-full object-cover sm:h-24 sm:w-24 md:h-28 md:w-28" />
               <div>
                 <p className="font-semibold">{member.name}</p>
                 <p className="mt-1 text-sm text-text2">{member.role}</p>
@@ -242,7 +349,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section id="architecture" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-surface1 px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section id="architecture" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-surface1 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <h2 className="reveal-item text-2xl font-semibold tracking-tight sm:text-3xl">Архитектура</h2>
         <div className="mt-10 space-y-8 border-t border-border pt-8">
           {storySteps.map((step, index) => (
@@ -258,15 +365,15 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section id="implementation" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section id="implementation" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <h2 className="reveal-item text-2xl font-semibold tracking-tight sm:text-3xl">Внедрение</h2>
-        <div className="reveal-item mt-8 overflow-hidden rounded-xl border border-border bg-surface1">
-          <table className="w-full border-collapse text-left text-sm sm:text-base">
+        <div className="reveal-item mt-8 overflow-x-auto rounded-xl border border-border bg-surface1">
+          <table className="min-w-[640px] w-full border-collapse text-left text-sm sm:text-base">
             <thead>
               <tr className="bg-surface2">
-                <th className="border-b border-border px-4 py-4">Критерий</th>
-                <th className="border-b border-border px-4 py-4">Стандартная разработка</th>
-                <th className="border-b border-border px-4 py-4">BioEQ</th>
+                <th className="border-b border-border px-4 py-4 text-text">Критерий</th>
+                <th className="border-b border-border px-4 py-4 text-text">Стандартная разработка</th>
+                <th className="border-b border-border px-4 py-4 text-text">BioEQ</th>
               </tr>
             </thead>
             <tbody>
@@ -290,15 +397,17 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
+      <section className="mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
         <div className="reveal-item border border-border bg-surface2 px-6 py-10 text-center sm:px-8">
           <h2 className="text-2xl font-semibold sm:text-3xl">Готовы начать?</h2>
-          <Button onClick={goToForm} className="mt-7 w-full sm:w-auto">Перейти к форме</Button>
+          <Button onClick={goToForm} className="mt-7 w-full sm:w-auto">
+            Перейти к форме
+          </Button>
         </div>
       </section>
 
       <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 text-sm text-text2 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-6xl justify-center px-4 py-6 text-center text-sm text-text2 sm:px-6 lg:px-8">
           <p>BioEQ © 2026</p>
         </div>
       </footer>
