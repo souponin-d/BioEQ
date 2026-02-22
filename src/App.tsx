@@ -1,11 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { LandingPage } from './pages/LandingPage';
 import { FormPage } from './pages/FormPage';
+import { LandingPage } from './pages/LandingPage';
 
 const App = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
-    <Route path="/form" element={<FormPage />} />
+    <Route path="/forms" element={<FormPage />} />
+    <Route path="/form" element={<Navigate to="/forms" replace />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );

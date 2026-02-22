@@ -21,3 +21,86 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  opacity: 0.24;
+  mix-blend-mode: multiply;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+.landing-blob-1 {
+  width: min(60vw, 800px);
+  height: min(60vw, 800px);
+  left: -20vw;
+  top: -26vh;
+  background: radial-gradient(circle at 35% 35%, rgba(0, 188, 212, 0.45), rgba(6, 57, 79, 0.35), rgba(255, 255, 255, 0));
+  animation: blobFloatA 30s ease-in-out infinite;
+}
+
+.landing-blob-2 {
+  width: min(54vw, 720px);
+  height: min(54vw, 720px);
+  right: -15vw;
+  top: 6vh;
+  background: radial-gradient(circle at 70% 30%, rgba(6, 57, 79, 0.36), rgba(0, 188, 212, 0.28), rgba(255, 255, 255, 0));
+  animation: blobFloatB 36s ease-in-out infinite;
+}
+
+.landing-blob-3 {
+  width: min(62vw, 860px);
+  height: min(62vw, 860px);
+  left: 10vw;
+  bottom: -34vh;
+  background: radial-gradient(circle at 45% 55%, rgba(0, 188, 212, 0.3), rgba(255, 255, 255, 0));
+  animation: blobFloatC 34s ease-in-out infinite;
+}
+
+.landing-blob-4 {
+  width: min(46vw, 620px);
+  height: min(46vw, 620px);
+  right: 14vw;
+  bottom: -18vh;
+  background: radial-gradient(circle at 55% 45%, rgba(6, 57, 79, 0.32), rgba(255, 255, 255, 0));
+  animation: blobFloatD 26s ease-in-out infinite;
+}
+
+@keyframes blobFloatA {
+  0%,
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.23; }
+  50% { transform: translate3d(4vw, 3vh, 0) scale(1.06) rotate(8deg); opacity: 0.3; }
+}
+
+@keyframes blobFloatB {
+  0%,
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.26; }
+  50% { transform: translate3d(-5vw, -2vh, 0) scale(0.95) rotate(-10deg); opacity: 0.2; }
+}
+
+@keyframes blobFloatC {
+  0%,
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.2; }
+  50% { transform: translate3d(6vw, -4vh, 0) scale(1.08) rotate(6deg); opacity: 0.28; }
+}
+
+@keyframes blobFloatD {
+  0%,
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.22; }
+  50% { transform: translate3d(-4vw, 3vh, 0) scale(0.94) rotate(-7deg); opacity: 0.29; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-blob {
+    animation: none;
+  }
+}
