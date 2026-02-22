@@ -53,6 +53,8 @@ export const LandingPage = () => {
   const navigate = useNavigate();
   const carouselRef = useRef<HTMLDivElement>(null);
   const goToForm = () => navigate('/forms');
+  const landingButtonClass =
+    'rounded-none border border-primary bg-transparent text-primary hover:border-accent hover:bg-transparent hover:text-accent';
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (!carouselRef.current) {
@@ -68,32 +70,33 @@ export const LandingPage = () => {
 
   return (
     <main className="bg-white text-primary">
-      <header className="sticky top-0 z-20 border-b border-primary/10 bg-white/85 backdrop-blur-sm">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <span className="text-lg font-semibold tracking-tight">BioEQ</span>
-          <nav className="hidden items-center gap-6 text-sm sm:flex">
-            <a href="#examples" className="text-primary/80 transition hover:text-primary">
-              Примеры
-            </a>
-            <a href="#team" className="text-primary/80 transition hover:text-primary">
-              Команда
-            </a>
-            <a href="#architecture" className="text-primary/80 transition hover:text-primary">
-              Архитектура
-            </a>
-            <a href="#implementation" className="text-primary/80 transition hover:text-primary">
-              Внедрение
-            </a>
-          </nav>
-          <Button onClick={goToForm} className="w-full sm:w-auto">
-            Старт
-          </Button>
-        </div>
-      </header>
-
-      <section className="relative isolate overflow-hidden">
+      <div className="relative min-h-screen isolate overflow-hidden">
         <AnimatedBackground />
-        <div className="relative mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <header className="sticky top-0 z-20 border-b border-primary/10 bg-white/85 backdrop-blur-sm">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <span className="text-lg font-semibold tracking-tight">BioEQ</span>
+            <nav className="hidden items-center gap-6 text-sm sm:flex">
+              <a href="#examples" className="text-primary/80 transition hover:text-primary">
+                Примеры
+              </a>
+              <a href="#team" className="text-primary/80 transition hover:text-primary">
+                Команда
+              </a>
+              <a href="#architecture" className="text-primary/80 transition hover:text-primary">
+                Архитектура
+              </a>
+              <a href="#implementation" className="text-primary/80 transition hover:text-primary">
+                Внедрение
+              </a>
+            </nav>
+            <Button onClick={goToForm} className={`w-full sm:w-auto ${landingButtonClass}`}>
+              Старт
+            </Button>
+          </div>
+        </header>
+
+        <section className="relative z-10">
+          <div className="relative mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <motion.div
             className="max-w-3xl text-center lg:text-left"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
@@ -110,13 +113,14 @@ export const LandingPage = () => {
               Вы заполняете параметры препарата, а наши ИИ-агенты делают всё остальное
             </motion.p>
             <motion.div variants={itemVariants} className="mt-10">
-              <Button onClick={goToForm} className="w-full sm:w-auto sm:px-8 sm:py-4 sm:text-base">
+              <Button onClick={goToForm} className={`w-full sm:w-auto sm:px-8 sm:py-4 sm:text-base ${landingButtonClass}`}>
                 Старт
               </Button>
             </motion.div>
           </motion.div>
         </div>
-      </section>
+        </section>
+      </div>
 
       <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-primary px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
         <div className="flex items-center justify-between gap-4">
@@ -228,7 +232,7 @@ export const LandingPage = () => {
       <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
         <div className="border border-primary/10 bg-neutral-50 px-6 py-10 text-center sm:px-8">
           <h2 className="text-2xl font-semibold sm:text-3xl">Готовы начать?</h2>
-          <Button onClick={goToForm} className="mt-7 w-full sm:w-auto">
+          <Button onClick={goToForm} className={`mt-7 w-full sm:w-auto ${landingButtonClass}`}>
             Перейти к форме
           </Button>
         </div>
