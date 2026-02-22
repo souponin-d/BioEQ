@@ -14,16 +14,22 @@ export const AnimatedBackground = () => (
       </div>
 
       <div className="blur-medium is-bottom-center">
-        <div className="blur-shape is-dark" />
+        <div className="blur-anim-move">
+          <div className="blur-shape is-dark" />
+        </div>
       </div>
     </div>
 
     <div className="blur-blending-shapes-wrapper">
       <div className="blur-large is-bottom-right">
-        <div className="blur-shape is-accent-soft" />
+        <div className="blur-anim-scale">
+          <div className="blur-shape is-accent-soft" />
+        </div>
       </div>
       <div className="blur-medium is-top-center">
-        <div className="blur-shape is-highlight" />
+        <div className="blur-anim-move">
+          <div className="blur-shape is-highlight" />
+        </div>
       </div>
     </div>
 
