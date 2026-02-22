@@ -22,85 +22,179 @@ body {
   min-height: 100vh;
 }
 
-.landing-bg {
+.blur-animation-wrapper {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  z-index: -10;
+  background: #ffffff;
   pointer-events: none;
 }
 
-.landing-blob {
+.blur-shapes-wrapper,
+.blur-blending-shapes-wrapper {
   position: absolute;
+  inset: 0;
+}
+
+.blur-large,
+.blur-medium {
+  position: absolute;
+}
+
+.blur-large {
+  width: 800px;
+  height: 800px;
+  left: -220px;
+  top: -260px;
+}
+
+.blur-medium {
+  width: 560px;
+  height: 560px;
+}
+
+.is-top-right {
+  right: -160px;
+  top: -80px;
+}
+
+.is-bottom-center {
+  left: 50%;
+  bottom: -220px;
+  transform: translateX(-50%);
+}
+
+.is-bottom-right {
+  right: -260px;
+  bottom: -280px;
+}
+
+.is-top-center {
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.blur-anim-move,
+.blur-anim-scale {
+  width: 100%;
+  height: 100%;
+}
+
+.blur-shape {
+  width: 100%;
+  height: 100%;
   border-radius: 9999px;
-  filter: blur(100px);
-  opacity: 0.24;
-  mix-blend-mode: multiply;
+  filter: blur(110px);
+  opacity: 0.28;
   will-change: transform, opacity;
-  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translateZ(0);
 }
 
-.landing-blob-1 {
-  width: min(60vw, 800px);
-  height: min(60vw, 800px);
-  left: -20vw;
-  top: -26vh;
-  background: radial-gradient(circle at 35% 35%, rgba(0, 188, 212, 0.45), rgba(6, 57, 79, 0.35), rgba(255, 255, 255, 0));
-  animation: blobFloatA 30s ease-in-out infinite;
+.is-primary {
+  background: radial-gradient(circle at 30% 30%, rgba(6, 57, 79, 0.38), rgba(6, 57, 79, 0.14), rgba(255, 255, 255, 0));
 }
 
-.landing-blob-2 {
-  width: min(54vw, 720px);
-  height: min(54vw, 720px);
-  right: -15vw;
-  top: 6vh;
-  background: radial-gradient(circle at 70% 30%, rgba(6, 57, 79, 0.36), rgba(0, 188, 212, 0.28), rgba(255, 255, 255, 0));
-  animation: blobFloatB 36s ease-in-out infinite;
+.is-accent {
+  background: radial-gradient(circle at 68% 35%, rgba(0, 188, 212, 0.32), rgba(0, 188, 212, 0.12), rgba(255, 255, 255, 0));
 }
 
-.landing-blob-3 {
-  width: min(62vw, 860px);
-  height: min(62vw, 860px);
-  left: 10vw;
-  bottom: -34vh;
-  background: radial-gradient(circle at 45% 55%, rgba(0, 188, 212, 0.3), rgba(255, 255, 255, 0));
-  animation: blobFloatC 34s ease-in-out infinite;
+.is-dark {
+  background: radial-gradient(circle at 50% 50%, rgba(6, 57, 79, 0.24), rgba(6, 57, 79, 0.08), rgba(255, 255, 255, 0));
+  opacity: 0.22;
 }
 
-.landing-blob-4 {
-  width: min(46vw, 620px);
-  height: min(46vw, 620px);
-  right: 14vw;
-  bottom: -18vh;
-  background: radial-gradient(circle at 55% 45%, rgba(6, 57, 79, 0.32), rgba(255, 255, 255, 0));
-  animation: blobFloatD 26s ease-in-out infinite;
+.is-accent-soft {
+  background: radial-gradient(circle at 35% 65%, rgba(0, 188, 212, 0.2), rgba(0, 188, 212, 0.06), rgba(255, 255, 255, 0));
+  opacity: 0.18;
 }
 
-@keyframes blobFloatA {
-  0%,
-  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.23; }
-  50% { transform: translate3d(4vw, 3vh, 0) scale(1.06) rotate(8deg); opacity: 0.3; }
+.is-highlight {
+  background: radial-gradient(circle at 50% 40%, rgba(6, 57, 79, 0.17), rgba(255, 255, 255, 0));
+  opacity: 0.16;
 }
 
-@keyframes blobFloatB {
-  0%,
-  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.26; }
-  50% { transform: translate3d(-5vw, -2vh, 0) scale(0.95) rotate(-10deg); opacity: 0.2; }
+.blur-anim-move {
+  animation: blurMove 28s ease-in-out infinite;
 }
 
-@keyframes blobFloatC {
-  0%,
-  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.2; }
-  50% { transform: translate3d(6vw, -4vh, 0) scale(1.08) rotate(6deg); opacity: 0.28; }
+.blur-anim-scale {
+  animation: blurScale 34s ease-in-out infinite;
 }
 
-@keyframes blobFloatD {
-  0%,
-  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.22; }
-  50% { transform: translate3d(-4vw, 3vh, 0) scale(0.94) rotate(-7deg); opacity: 0.29; }
+@keyframes blurMove {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(60px, -40px, 0) scale(1.05);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes blurScale {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translate3d(-30px, 50px, 0) scale(1.1);
+    opacity: 0.32;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 0.22;
+  }
+}
+
+.blur-noise {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, rgba(6, 57, 79, 0.025) 0, rgba(6, 57, 79, 0.025) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg, rgba(0, 188, 212, 0.02) 0, rgba(0, 188, 212, 0.02) 1px, transparent 1px, transparent 4px);
+  opacity: 0.05;
+}
+
+@media (max-width: 768px) {
+  .blur-large {
+    width: 520px;
+    height: 520px;
+    left: -220px;
+    top: -180px;
+  }
+
+  .blur-medium {
+    width: 340px;
+    height: 340px;
+  }
+
+  .is-top-right {
+    right: -120px;
+    top: -90px;
+  }
+
+  .is-bottom-center {
+    bottom: -150px;
+  }
+
+  .is-bottom-right {
+    right: -170px;
+    bottom: -180px;
+  }
+
+  .is-top-center {
+    top: -150px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-blob {
-    animation: none;
+  .blur-anim-move,
+  .blur-anim-scale {
+    animation: none !important;
   }
 }
