@@ -5,18 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: '#ffffff',
-        primary: '#06394f',
-        accent: '#00bcd4',
+        base: 'var(--bg)',
+        surface1: 'var(--surface-1)',
+        surface2: 'var(--surface-2)',
+        text: 'var(--text)',
+        text2: 'var(--text-2)',
+        border: 'var(--border)',
+        primary: 'var(--primary)',
+        'primary-hover': 'var(--primary-hover)',
+        accent: 'var(--accent)',
+        'accent-hover': 'var(--accent-hover)',
         neutral: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          700: '#334155'
+          50: '#0B1224',
+          100: '#0F1B34',
+          200: 'rgba(255,255,255,0.1)',
+          700: '#EAF0FF'
         }
       },
       boxShadow: {
-        card: '0 24px 50px -20px rgba(6, 57, 79, 0.2)'
+        card: '0 20px 48px -24px rgba(0, 0, 0, 0.65)'
       },
       keyframes: {
         aurora: {
