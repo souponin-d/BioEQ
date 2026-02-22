@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image1 from '../assets/images/1.png';
 import image2 from '../assets/images/2.png';
@@ -44,6 +44,8 @@ const exampleCards = Array.from({ length: 4 }, (_, index) => ({
   text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 }));
 
+const loopedExampleCards = [...exampleCards, ...exampleCards];
+
 const itemVariants = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
@@ -67,6 +69,30 @@ export const LandingPage = () => {
       behavior: 'smooth'
     });
   };
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    const halfWidth = carousel.scrollWidth / 2;
+    carousel.scrollLeft = halfWidth;
+
+    const handleScroll = () => {
+      const threshold = 2;
+
+      if (carousel.scrollLeft <= threshold) {
+        carousel.scrollLeft = halfWidth - threshold;
+      } else if (carousel.scrollLeft >= halfWidth * 2 - carousel.clientWidth - threshold) {
+        carousel.scrollLeft = halfWidth;
+      }
+    };
+
+    carousel.addEventListener('scroll', handleScroll, { passive: true });
+    return () => carousel.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <main className="bg-white text-primary">
@@ -122,7 +148,7 @@ export const LandingPage = () => {
         </section>
       </div>
 
-      <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-primary px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
+      <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 overflow-x-clip bg-primary px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Примеры</h2>
           <div className="hidden items-center gap-3 md:flex">
@@ -151,14 +177,14 @@ export const LandingPage = () => {
           ref={carouselRef}
           className="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {exampleCards.map((card, index) => (
+          {loopedExampleCards.map((card, index) => (
             <motion.article
-              key={card.id}
+              key={`${card.id}-${index}`}
               initial={{ opacity: 0, x: 36 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.45, delay: index * 0.08, ease: 'easeOut' }}
               viewport={{ once: true, amount: 0.3 }}
-              whileHover={{ y: -8, scale: 1.01 }}
+              whileHover={{ y: -8 }}
               className="min-w-[82%] snap-start rounded-2xl border border-white/15 bg-white/10 p-6 shadow-card backdrop-blur-sm sm:min-w-[56%] lg:min-w-[38%]"
             >
               <h3 className="text-xl font-semibold">{card.title}</h3>
@@ -185,7 +211,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section id="architecture" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-primary px-4 pb-16 text-white sm:px-6 lg:px-8 lg:pb-24">
+      <section id="architecture" className="mx-auto w-full max-w-6xl scroll-mt-24 bg-primary px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Архитектура</h2>
         <div className="mt-10 space-y-8 border-t border-white/20 pt-8">
           {storySteps.map((step) => (
@@ -197,7 +223,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <section id="implementation" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
+      <section id="implementation" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 text-primary sm:px-6 lg:px-8 lg:py-24">
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Внедрение</h2>
         <div className="mt-8 overflow-hidden border border-primary/15">
           <table className="w-full border-collapse text-left text-sm sm:text-base">
