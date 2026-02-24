@@ -6,6 +6,7 @@ import image2 from '../assets/images/2.png';
 import image3 from '../assets/images/3.png';
 import image4 from '../assets/images/4.png';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { BrandLogo } from '../components/BrandLogo';
 import { Button } from '../components/Button';
 
 const storySteps = [
@@ -22,6 +23,7 @@ const teamMembers = [
 ];
 
 const sectionLinks = [
+  { id: 'advantages', label: 'Преимущества' },
   { id: 'examples', label: 'Примеры' },
   { id: 'team', label: 'Команда' },
   { id: 'architecture', label: 'Архитектура' },
@@ -43,12 +45,14 @@ export const LandingPage = () => {
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
-  const [activeSection, setActiveSection] = useState('examples');
+  const [activeSection, setActiveSection] = useState(sectionLinks[0].id);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(!prefersReducedMotion);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [queuedDirection, setQueuedDirection] = useState<'left' | 'right' | null>(null);
 
   const displayCards = useMemo(() => {
     if (exampleCards.length <= 1) return exampleCards;
@@ -84,12 +88,27 @@ export const LandingPage = () => {
     if (!target) return;
     const headerOffset = (headerRef.current?.offsetHeight ?? 72) + 14;
     const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-    window.history.pushState(null, '', `#${id}`);
+    window.history.replaceState(null, '', `#${id}`);
     window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     closeMobileMenu();
   };
 
+  const scrollToHero = () => {
+    scrollToId('hero');
+  };
+
   const moveSlide = (direction: 'left' | 'right') => {
+    if (displayCards.length <= 1 || prefersReducedMotion) {
+      setCurrentSlide((prev) => prev + (direction === 'right' ? 1 : -1));
+      return;
+    }
+
+    if (isAnimating) {
+      setQueuedDirection(direction);
+      return;
+    }
+
+    setIsAnimating(true);
     setCurrentSlide((prev) => prev + (direction === 'right' ? 1 : -1));
   };
 
@@ -115,7 +134,7 @@ export const LandingPage = () => {
           if (entry.isIntersecting) setActiveSection(entry.target.id);
         });
       },
-      { rootMargin: '-40% 0px -45% 0px', threshold: 0.2 }
+      { rootMargin: '-38% 0px -50% 0px', threshold: 0.18 }
     );
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
@@ -170,13 +189,18 @@ export const LandingPage = () => {
     if (currentSlide === displayCards.length - 1) {
       setIsTransitionEnabled(false);
       setCurrentSlide(1);
+      setIsAnimating(false);
       return;
     }
 
     if (currentSlide === 0) {
       setIsTransitionEnabled(false);
       setCurrentSlide(exampleCards.length);
+      setIsAnimating(false);
+      return;
     }
+
+    setIsAnimating(false);
   };
 
   useEffect(() => {
@@ -193,6 +217,17 @@ export const LandingPage = () => {
     return () => cancelAnimationFrame(id);
   }, [isTransitionEnabled, prefersReducedMotion]);
 
+  useEffect(() => {
+    if (!queuedDirection || isAnimating) return;
+    const timeoutId = window.setTimeout(() => {
+      const direction = queuedDirection;
+      setQueuedDirection(null);
+      if (direction) moveSlide(direction);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isAnimating, queuedDirection]);
+
   return (
     <main className="bg-base text-text">
       <div className="relative min-h-screen isolate overflow-hidden bg-base">
@@ -200,12 +235,12 @@ export const LandingPage = () => {
 
         <header
           ref={headerRef}
-          className={`fixed inset-x-0 top-0 z-30 transition-all duration-300 ${
+          className={`fixed inset-x-0 top-0 z-[100] transition-all duration-300 ${
             isScrolled ? 'bg-base/80 shadow-[0_20px_45px_-35px_rgba(0,0,0,0.8)] backdrop-blur-xl' : 'bg-transparent'
           }`}
         >
           <div ref={navRef} className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <span className="text-lg font-semibold tracking-tight text-white">BioEQ</span>
+            <BrandLogo onClick={scrollToHero} />
             <nav className="hidden items-center gap-6 text-sm md:flex">
               {sectionLinks.map((link) => (
                 <button
@@ -257,7 +292,7 @@ export const LandingPage = () => {
           </div>
         </header>
 
-        <section className="relative z-10 text-white">
+        <section id="hero" className="relative z-10 scroll-mt-24 text-white">
           <div className="relative z-10 mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
             <motion.div className="max-w-3xl text-center lg:text-left" variants={heroVariants} initial="hidden" animate="visible">
               <motion.h1 variants={heroItem} className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
@@ -279,6 +314,13 @@ export const LandingPage = () => {
         </section>
       </div>
 
+      <section id="advantages" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8 lg:pt-20">
+        <div className="reveal-item rounded-2xl border border-border bg-surface1 p-6 sm:p-8">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Преимущества</h2>
+          <div className="mt-6 min-h-28 rounded-xl border border-dashed border-border/90 bg-surface2/55" />
+        </div>
+      </section>
+
       <section id="examples" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <div className="reveal-item flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Примеры</h2>
@@ -287,6 +329,7 @@ export const LandingPage = () => {
               type="button"
               aria-label="Предыдущий слайд"
               onClick={() => moveSlide('left')}
+              disabled={isAnimating}
               className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
             >
               ←
@@ -295,6 +338,7 @@ export const LandingPage = () => {
               type="button"
               aria-label="Следующий слайд"
               onClick={() => moveSlide('right')}
+              disabled={isAnimating}
               className="rounded-full border border-border px-4 py-2 text-sm text-text2 transition hover:bg-surface2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
             >
               →
@@ -321,7 +365,7 @@ export const LandingPage = () => {
                 <h3 className="text-xl font-semibold">{card.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-text2">{card.text}</p>
                 <Button variant="outline" className="mt-6">
-                  Скачать
+                  Перейти
                 </Button>
               </article>
             ))}
@@ -378,17 +422,17 @@ export const LandingPage = () => {
             </thead>
             <tbody>
               <tr className="odd:bg-white/[0.03]">
-                <td className="border-b border-border px-4 py-4 font-medium">Время</td>
+                <td className="border-b border-border px-4 py-4 font-medium text-text">Время</td>
                 <td className="border-b border-border px-4 py-4 text-text2">10–14 недель</td>
                 <td className="border-b border-border px-4 py-4 text-text2">2–4 недели</td>
               </tr>
               <tr className="odd:bg-white/[0.03]">
-                <td className="border-b border-border px-4 py-4 font-medium">Стоимость</td>
+                <td className="border-b border-border px-4 py-4 font-medium text-text">Стоимость</td>
                 <td className="border-b border-border px-4 py-4 text-text2">Высокая, много ручных итераций</td>
                 <td className="border-b border-border px-4 py-4 text-text2">Ниже на ~35% за счёт автоматизации</td>
               </tr>
               <tr className="odd:bg-white/[0.03]">
-                <td className="px-4 py-4 font-medium">Что-то ещё</td>
+                <td className="px-4 py-4 font-medium text-text">Что-то ещё</td>
                 <td className="px-4 py-4 text-text2">Фрагментированные отчёты и зависимость от экспертов</td>
                 <td className="px-4 py-4 text-text2">Единый pipeline, прозрачные расчёты и шаблоны</td>
               </tr>

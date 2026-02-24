@@ -25,7 +25,7 @@ const normalizePayload = (data: BioEQFormSchema): BioEQFormData => ({
 });
 
 const baseInput =
-  'mt-1 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20';
+  'mt-1 w-full rounded-xl border border-border bg-surface2 px-3 py-2 text-sm text-text outline-none transition placeholder:text-text2 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/35 disabled:cursor-not-allowed disabled:opacity-60';
 
 export const BioEQForm = () => {
   const {
@@ -128,15 +128,15 @@ export const BioEQForm = () => {
           />
 
           <div>
-            <p className="text-sm font-medium text-primary">Режим приёма</p>
+            <p className="text-sm font-medium text-text">Режим приёма</p>
             <div className="mt-2 flex flex-wrap gap-4">
               {administrationOptions.map((option) => (
-                <label key={option} className="flex items-center gap-2 text-sm text-primary">
+                <label key={option} className="flex items-center gap-2 text-sm text-text2">
                   <input
                     type="checkbox"
                     value={option}
                     {...register('administration_mode')}
-                    className="h-4 w-4 rounded border-neutral-300 text-accent focus:ring-accent"
+                    className="h-4 w-4 rounded border-border bg-surface2 text-accent focus:ring-accent"
                   />
                   {option}
                 </label>
@@ -191,8 +191,8 @@ export const BioEQForm = () => {
         {isSubmitting ? 'Отправка...' : 'Сформировать запрос'}
       </button>
 
-      {successMessage && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{successMessage}</p>}
-      {errorMessage && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p>}
+      {successMessage && <p className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{successMessage}</p>}
+      {errorMessage && <p className="rounded-xl border border-red-400/35 bg-red-500/10 px-4 py-3 text-sm text-red-200">{errorMessage}</p>}
     </form>
   );
 };
@@ -204,7 +204,7 @@ type FieldProps = {
 };
 
 const Field = ({ label, children, error }: FieldProps) => (
-  <label className="block text-sm font-medium text-primary">
+  <label className="block text-sm font-medium text-text">
     {label}
     {children}
     {error && <span className="mt-1 block text-sm text-red-600">{error}</span>}
@@ -212,8 +212,8 @@ const Field = ({ label, children, error }: FieldProps) => (
 );
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
-  <section className="space-y-4 border-b border-neutral-200 pb-6 last:border-0 last:pb-0">
-    <h2 className="text-lg font-semibold text-primary">{title}</h2>
+  <section className="space-y-4 border-b border-border pb-6 last:border-0 last:pb-0">
+    <h2 className="text-lg font-semibold text-text">{title}</h2>
     {children}
   </section>
 );
@@ -232,16 +232,16 @@ const RadioGroupField = ({ title, name, options, control, error }: RadioGroupFie
     control={control}
     render={({ field }) => (
       <div>
-        <p className="text-sm font-medium text-primary">{title}</p>
+        <p className="text-sm font-medium text-text">{title}</p>
         <div className="mt-2 flex flex-wrap gap-4">
           {options.map((option) => (
-            <label key={option} className="flex items-center gap-2 text-sm text-primary">
+            <label key={option} className="flex items-center gap-2 text-sm text-text2">
               <input
                 type="radio"
                 value={option}
                 checked={field.value === option}
                 onChange={field.onChange}
-                className="h-4 w-4 border-neutral-300 text-accent focus:ring-accent"
+                className="h-4 w-4 border-border bg-surface2 text-accent focus:ring-accent"
               />
               {option}
             </label>
