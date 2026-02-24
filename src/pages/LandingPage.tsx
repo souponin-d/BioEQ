@@ -230,67 +230,67 @@ export const LandingPage = () => {
 
   return (
     <main className="bg-base text-text">
-      <div className="relative min-h-screen isolate overflow-hidden bg-base">
-        <AnimatedBackground />
+      <header
+        ref={headerRef}
+        className={`fixed inset-x-0 top-0 z-[100] transition-all duration-300 ${
+          isScrolled ? 'bg-base/80 shadow-[0_20px_45px_-35px_rgba(0,0,0,0.8)] backdrop-blur-xl' : 'bg-transparent'
+        }`}
+      >
+        <div ref={navRef} className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <BrandLogo onClick={scrollToHero} />
+          <nav className="hidden items-center gap-6 text-sm md:flex">
+            {sectionLinks.map((link) => (
+              <button
+                key={link.id}
+                type="button"
+                onClick={() => scrollToId(link.id)}
+                className={`relative py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base ${
+                  activeSection === link.id ? 'text-white' : 'text-white/75 hover:text-white'
+                }`}
+              >
+                {link.label}
+                {activeSection === link.id ? (
+                  <span className="absolute bottom-[-6px] left-0 h-[2px] w-full bg-[image:var(--accent-line)]" />
+                ) : null}
+              </button>
+            ))}
+          </nav>
 
-        <header
-          ref={headerRef}
-          className={`fixed inset-x-0 top-0 z-[100] transition-all duration-300 ${
-            isScrolled ? 'bg-base/80 shadow-[0_20px_45px_-35px_rgba(0,0,0,0.8)] backdrop-blur-xl' : 'bg-transparent'
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md border border-border bg-surface1 px-3 py-2 text-sm text-white transition hover:bg-surface2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base md:hidden"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-nav"
+            aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+        </div>
+
+        <div
+          id="mobile-nav"
+          className={`border-t border-border bg-base/95 px-4 py-4 backdrop-blur-lg transition md:hidden ${
+            isMobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
-          <div ref={navRef} className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <BrandLogo onClick={scrollToHero} />
-            <nav className="hidden items-center gap-6 text-sm md:flex">
-              {sectionLinks.map((link) => (
-                <button
-                  key={link.id}
-                  type="button"
-                  onClick={() => scrollToId(link.id)}
-                  className={`relative py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base ${
-                    activeSection === link.id ? 'text-white' : 'text-white/75 hover:text-white'
-                  }`}
-                >
-                  {link.label}
-                  {activeSection === link.id ? (
-                    <span className="absolute bottom-[-6px] left-0 h-[2px] w-full bg-[image:var(--accent-line)]" />
-                  ) : null}
-                </button>
-              ))}
-            </nav>
-
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-surface1 px-3 py-2 text-sm text-white transition hover:bg-surface2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base md:hidden"
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-nav"
-              aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
-            >
-              {isMobileMenuOpen ? '✕' : '☰'}
-            </button>
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
+            {sectionLinks.map((link) => (
+              <button
+                key={link.id}
+                type="button"
+                onClick={() => scrollToId(link.id)}
+                className="w-full rounded-md border border-border px-3 py-2 text-left text-sm text-white/85 transition hover:bg-surface2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+              >
+                {link.label}
+              </button>
+            ))}
           </div>
+        </div>
+      </header>
 
-          <div
-            id="mobile-nav"
-            className={`border-t border-border bg-base/95 px-4 py-4 backdrop-blur-lg transition md:hidden ${
-              isMobileMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-            }`}
-          >
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
-              {sectionLinks.map((link) => (
-                <button
-                  key={link.id}
-                  type="button"
-                  onClick={() => scrollToId(link.id)}
-                  className="w-full rounded-md border border-border px-3 py-2 text-left text-sm text-white/85 transition hover:bg-surface2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </header>
+      <div className="relative min-h-screen isolate overflow-hidden bg-base">
+        <AnimatedBackground />
 
         <section id="hero" className="relative z-10 scroll-mt-24 text-white">
           <div className="relative z-10 mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
