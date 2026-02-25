@@ -69,14 +69,14 @@ const SWIPE_THRESHOLD = 50;
 const AdvantageCard = ({ title, description, icon, iconAlt, revealDelay }: (typeof advantages)[number] & { revealDelay: number }) => (
   <article
     data-reveal-delay={revealDelay}
-    className="advantage-card reveal-item group relative flex h-full flex-col overflow-hidden rounded-[18px] border border-border bg-surface1 p-5 text-white shadow-card transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-6"
+    className="advantage-card reveal-item group relative flex h-full flex-col overflow-hidden rounded-[18px] border border-border bg-surface1 p-5 shadow-card transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-6"
   >
     <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-[image:var(--accent-line)] opacity-95" aria-hidden="true" />
     <div className="advantage-icon-wrap mb-4 flex h-24 w-24 items-center justify-center sm:mb-5 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
       <img src={icon} alt={iconAlt} className="advantage-icon h-20 w-20 object-contain sm:h-24 sm:w-24 lg:h-28 lg:w-28" loading="lazy" />
     </div>
-    <h3 className="text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl">{title}</h3>
-    <p className="mt-3 text-sm leading-relaxed sm:text-base">{description}</p>
+    <h3 className="text-lg font-semibold leading-tight tracking-tight text-text sm:text-xl">{title}</h3>
+    <p className="mt-3 text-sm leading-relaxed text-text2 sm:text-base">{description}</p>
   </article>
 );
 
