@@ -5,6 +5,9 @@ import image1 from '../assets/images/1.png';
 import image2 from '../assets/images/2.png';
 import image3 from '../assets/images/3.png';
 import image4 from '../assets/images/4.png';
+import iconBrain from '../assets/images/icon_brain.png';
+import iconPk from '../assets/images/icon_PK.png';
+import iconSecure from '../assets/images/icon_secure.png';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { BrandLogo } from '../components/BrandLogo';
 import { Button } from '../components/Button';
@@ -36,8 +39,46 @@ const exampleCards = Array.from({ length: 4 }, (_, index) => ({
   text: 'Короткий пример входных данных и ожидаемого результата проектирования исследования.'
 }));
 
+const advantages = [
+  {
+    icon: iconPk,
+    iconAlt: 'Иконка фармакокинетики',
+    title: 'Фармакокинетика',
+    description:
+      'Наш продукт сочетает ИИ-анализ с детерминированной PK-верификацией: ключевые выводы и параметры автоматически проверяются стандартными методами фармакокинетического моделирования, принятыми в индустрии. Это повышает точность и интерпретируемость результатов и снижает риск ошибок и “галлюцинаций”.'
+  },
+  {
+    icon: iconSecure,
+    iconAlt: 'Иконка безопасности',
+    title: 'Безопасность',
+    description:
+      'Решение развёртывается полностью в контуре заказчика: на собственных или выделенных мощностях, без внешних API и передачи данных третьим сторонам. Это обеспечивает независимость от внешних ограничений (санкции, блокировки) и упрощает выполнение требований информационной безопасности: контроль доступа, журналирование и управляемость окружения.'
+  },
+  {
+    icon: iconBrain,
+    iconAlt: 'Иконка полной истории размышления',
+    title: 'Полная история размышления',
+    description:
+      'Каждый результат формируется и сохраняется как аудитируемый артефакт: URL/ID записи в базе или реестре, точная цитата (с указанием места в документе), извлечённые структурированные поля и вычислительный лог/шаги расчёта. Это обеспечивает воспроизводимую трассируемость “запрос → поиск → источник → цитата → данные → вывод”, упрощает QA/RA-проверку и ускоряет согласования с партнёрами и регуляторами.'
+  }
+];
+
 const CAROUSEL_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const SWIPE_THRESHOLD = 50;
+
+const AdvantageCard = ({ title, description, icon, iconAlt, revealDelay }: (typeof advantages)[number] & { revealDelay: number }) => (
+  <article
+    data-reveal-delay={revealDelay}
+    className="advantage-card reveal-item group relative flex h-full flex-col overflow-hidden rounded-[18px] border border-border bg-surface1 p-5 text-white shadow-card transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-6"
+  >
+    <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-[image:var(--accent-line)] opacity-95" aria-hidden="true" />
+    <div className="advantage-icon-wrap mb-4 flex h-24 w-24 items-center justify-center sm:mb-5 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
+      <img src={icon} alt={iconAlt} className="advantage-icon h-20 w-20 object-contain sm:h-24 sm:w-24 lg:h-28 lg:w-28" loading="lazy" />
+    </div>
+    <h3 className="text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl">{title}</h3>
+    <p className="mt-3 text-sm leading-relaxed sm:text-base">{description}</p>
+  </article>
+);
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -315,9 +356,13 @@ export const LandingPage = () => {
       </div>
 
       <section id="advantages" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8 lg:pt-20">
-        <div className="reveal-item rounded-2xl border border-border bg-surface1 p-6 sm:p-8">
+        <div className="reveal-item">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Преимущества</h2>
-          <div className="mt-6 min-h-28 rounded-xl border border-dashed border-border/90 bg-surface2/55" />
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {advantages.map((advantage, index) => (
+              <AdvantageCard key={advantage.title} {...advantage} revealDelay={index * 100} />
+            ))}
+          </div>
         </div>
       </section>
 

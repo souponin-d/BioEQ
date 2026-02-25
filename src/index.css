@@ -146,11 +146,38 @@ body {
   }
 }
 
+
+.advantage-card {
+  box-shadow: 0 20px 48px -24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .advantage-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(79, 124, 255, 0.38);
+    box-shadow: 0 30px 65px -34px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(79, 124, 255, 0.22), 0 0 26px -12px rgba(34, 211, 238, 0.55);
+  }
+  .advantage-card:hover .advantage-icon {
+    transform: translateY(-2px) rotate(-1.5deg);
+  }
+}
+
+.advantage-icon {
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal-item {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .advantage-card,
+  .advantage-icon {
+    transition: none;
+    transform: none;
   }
 
   .blur-shape {
