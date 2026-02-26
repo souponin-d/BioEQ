@@ -409,9 +409,13 @@ export const LandingPage = () => {
               >
                 <h3 className="text-xl font-semibold">{card.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-text2">{card.text}</p>
-                <Button variant="outline" className="mt-6">
-                  Перейти
-                </Button>
+                <Button 
+                variant="outline" 
+                className="mt-6" 
+                onClick={() => navigate('/dashboard')}
+              >
+                Перейти
+              </Button>
               </article>
             ))}
           </div>
