@@ -35,7 +35,7 @@ export const DashboardPage = () => {
             </h3>
             <p className="mt-2 text-sm text-text2">Haleon • Фаза I</p>
             <div className="mt-6 flex items-center text-sm font-medium text-white">
-              Открыть eProtocol <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+              Открыть BioEQprotocol <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </div>
           </article>
         </section>
