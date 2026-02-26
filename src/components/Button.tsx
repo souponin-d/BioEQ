@@ -1,15 +1,17 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 type Variant = 'primary' | 'outline' | 'ghost';
+type Size = 'sm' | 'md';
 
 type Props = {
   children: ReactNode;
   className?: string;
   variant?: Variant;
+  size?: Size;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const baseClassName =
-  'inline-flex items-center justify-center rounded-md border px-6 py-3 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(34,211,238,0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none';
+  'inline-flex items-center justify-center rounded-md border font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(34,211,238,0.35)] focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none';
 
 const variants: Record<Variant, string> = {
   primary:
@@ -18,8 +20,13 @@ const variants: Record<Variant, string> = {
   ghost: 'border-transparent bg-transparent text-text2 hover:bg-surface2 hover:text-text'
 };
 
-export const Button = ({ children, className = '', type = 'button', variant = 'primary', ...rest }: Props) => (
-  <button type={type} className={`${baseClassName} ${variants[variant]} ${className}`.trim()} {...rest}>
+const sizes: Record<Size, string> = {
+  sm: 'px-4 py-2 text-xs',
+  md: 'px-6 py-3 text-sm'
+};
+
+export const Button = ({ children, className = '', type = 'button', variant = 'primary', size = 'md', ...rest }: Props) => (
+  <button type={type} className={`${baseClassName} ${sizes[size]} ${variants[variant]} ${className}`.trim()} {...rest}>
     {children}
   </button>
 );
