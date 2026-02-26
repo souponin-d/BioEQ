@@ -63,6 +63,21 @@ const advantages = [
   }
 ];
 
+const implementationRows = [
+  {
+    label: 'Время',
+    traditional: '1–3 недели (≈40–120 ч)',
+    bioeq: '1 час',
+    savings: '97.5%'
+  },
+  {
+    label: 'Финансы',
+    traditional: '250,000–300,000 ₽ (пакет BE + SAP)*',
+    bioeq: '~$1.60 (≈124 ₽)**',
+    savings: '99.17%'
+  }
+];
+
 const CAROUSEL_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const SWIPE_THRESHOLD = 50;
 
@@ -460,33 +475,72 @@ export const LandingPage = () => {
 
       <section id="implementation" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
         <h2 className="reveal-item text-2xl font-semibold tracking-tight sm:text-3xl">Внедрение</h2>
-        <div className="reveal-item mt-8 overflow-x-auto rounded-xl border border-border bg-surface1">
-          <table className="min-w-[640px] w-full border-collapse text-left text-sm sm:text-base">
-            <thead>
-              <tr className="bg-surface2">
-                <th className="border-b border-border px-4 py-4 text-text">Критерий</th>
-                <th className="border-b border-border px-4 py-4 text-text">Стандартная разработка</th>
-                <th className="border-b border-border px-4 py-4 text-text">BioEQ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="odd:bg-white/[0.03]">
-                <td className="border-b border-border px-4 py-4 font-medium text-text">Время</td>
-                <td className="border-b border-border px-4 py-4 text-text2">10–14 недель</td>
-                <td className="border-b border-border px-4 py-4 text-text2">2–4 недели</td>
-              </tr>
-              <tr className="odd:bg-white/[0.03]">
-                <td className="border-b border-border px-4 py-4 font-medium text-text">Стоимость</td>
-                <td className="border-b border-border px-4 py-4 text-text2">Высокая, много ручных итераций</td>
-                <td className="border-b border-border px-4 py-4 text-text2">Ниже на ~35% за счёт автоматизации</td>
-              </tr>
-              <tr className="odd:bg-white/[0.03]">
-                <td className="px-4 py-4 font-medium text-text">Что-то ещё</td>
-                <td className="px-4 py-4 text-text2">Фрагментированные отчёты и зависимость от экспертов</td>
-                <td className="px-4 py-4 text-text2">Единый pipeline, прозрачные расчёты и шаблоны</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="reveal-item mt-8 rounded-2xl border border-border bg-surface1/90 p-5 shadow-card sm:p-7 lg:p-10">
+          <div className="hidden overflow-hidden rounded-2xl border border-white/10 md:block">
+            <table className="w-full table-fixed border-collapse text-left text-sm text-text sm:text-base">
+              <thead>
+                <tr className="border-b border-cyan-300/30 bg-white/[0.03]">
+                  <th className="w-[17%] px-5 py-6 text-left font-semibold text-text2" aria-label="Пустой заголовок для лейблов строк" />
+                  <th className="w-[35%] px-5 py-6 text-left text-base font-semibold text-text">Традиционные методы</th>
+                  <th className="w-[24%] bg-emerald-400/80 px-5 py-6 text-center text-base font-semibold text-white">BioEQ</th>
+                  <th className="w-[24%] px-5 py-6 text-left text-base font-semibold text-text">Экономия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {implementationRows.map((row, index) => (
+                  <tr key={row.label} className={index === implementationRows.length - 1 ? '' : 'border-b border-cyan-300/25'}>
+                    <th scope="row" className="px-5 py-7 text-left text-lg font-semibold text-white">
+                      {row.label}
+                    </th>
+                    <td className="px-5 py-7 text-base leading-relaxed text-text">{row.traditional}</td>
+                    <td className="bg-emerald-400/80 px-5 py-7 text-center text-lg font-semibold text-white">{row.bioeq}</td>
+                    <td className="px-5 py-7 text-left text-3xl font-black tracking-tight text-white">{row.savings}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="space-y-4 md:hidden">
+            {implementationRows.map((row) => (
+              <article key={row.label} className="rounded-2xl border border-cyan-200/20 bg-white/[0.02] p-5">
+                <h3 className="border-b border-cyan-300/25 pb-3 text-lg font-semibold text-white">{row.label}</h3>
+                <div className="mt-4 space-y-3 text-sm">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.14em] text-text2">Традиционные методы</p>
+                    <p className="mt-1 text-base leading-snug text-text">{row.traditional}</p>
+                  </div>
+                  <div className="rounded-xl bg-emerald-400/80 px-4 py-3 text-center">
+                    <p className="text-xs uppercase tracking-[0.14em] text-white/85">BioEQ</p>
+                    <p className="mt-1 text-lg font-semibold text-white">{row.bioeq}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.14em] text-text2">Экономия</p>
+                    <p className="mt-1 text-3xl font-black tracking-tight text-white">{row.savings}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-7 space-y-2 text-center text-xs leading-relaxed text-text2 sm:text-sm">
+            <p>
+              *&nbsp;&nbsp;–&nbsp;&nbsp;по данным{' '}
+              <a
+                href="https://ecosafety.ru/ru/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-accent underline decoration-accent/80 underline-offset-2 transition-colors hover:text-accent-hover"
+              >
+                ecosafety.ru/ru/
+              </a>
+            </p>
+            <p>**&nbsp;–&nbsp;&nbsp;стоимость аренды необходимых вычислительных мощностей, без учёта SaaS</p>
+          </div>
+
+          <p className="mt-6 text-center text-base font-semibold leading-relaxed text-white sm:text-lg">
+            Общие инвестиции в разворачивание системы оцениваются в 500 000 рублей и 2 месяца работы
+          </p>
         </div>
       </section>
 
