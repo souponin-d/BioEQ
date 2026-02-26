@@ -25,7 +25,7 @@ export const StudyPage = () => {
   const initialStudy = studiesData[(id || 'paracetamol') as StudyKey];
   const [tabs, setTabs] = useState(initialStudy?.tabs || []);
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id || '');
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<any>(plotData);
 
   if (!initialStudy) {
     return (

@@ -7,7 +7,12 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="relative min-h-screen bg-base text-text overflow-hidden">
+    <motion.main
+      className="relative min-h-screen bg-base text-text overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+    >
       {/* Тот самый фон с лендинга */}
       <AnimatedBackground />
 
@@ -40,6 +45,6 @@ export const DashboardPage = () => {
           </article>
         </section>
       </div>
-    </main>
+    </motion.main>
   );
 };
