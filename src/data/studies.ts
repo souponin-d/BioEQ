@@ -1,3 +1,19 @@
+export type SectionStatus = 'empty' | 'draft' | 'done';
+
+export interface StudyTab {
+  id: string;
+  label: string;
+  status: SectionStatus;
+  content: string;
+}
+
+export interface StudyData {
+  id: string;
+  drug: string;
+  title: string;
+  tabs: StudyTab[];
+}
+
 export const studiesData: Record<string, StudyData> = {
   paracetamol: {
     id: 'paracetamol',
@@ -79,3 +95,5 @@ export const studiesData: Record<string, StudyData> = {
     ]
   }
 };
+
+export type StudyKey = keyof typeof studiesData;

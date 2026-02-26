@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { saveAs } from 'file-saver';
 import { 
@@ -187,7 +187,7 @@ export const StudyPage = () => {
         
         <div className="flex gap-3">
           {isEverythingDone ? (
-            <Button size="sm" onClick={exportToDocx} disabled={isExporting} className="bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+            <Button onClick={exportToDocx} disabled={isExporting} className="bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
               {isExporting ? "ГЕНЕРАЦИЯ..." : "СКАЧАТЬ DOCX"}
             </Button>
           ) : (
@@ -246,7 +246,7 @@ export const StudyPage = () => {
                   <input type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
                 </label>
               )}
-              <Button size="sm" onClick={markAsDone} className="bg-green-600 hover:bg-green-500 text-xs px-6 uppercase font-black">Завершить</Button>
+              <Button onClick={markAsDone} className="bg-green-600 hover:bg-green-500 text-xs px-6 uppercase font-black">Завершить</Button>
             </div>
           </div>
 
