@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "timestamp": "2026-02-23 19:44:22",
+  "input": {
+    "CV": 0.225,
+    "targetpower": 0.8,
+    "design": "2x2x4"
+  },
+  "results": {
+    "base_sample_size": 12,
+    "recommended_sample_size_with_dropout": 14,
+    "dropout_rate_used": 0.2,
+    "achieved_power": 0.8301
+  }
+}
